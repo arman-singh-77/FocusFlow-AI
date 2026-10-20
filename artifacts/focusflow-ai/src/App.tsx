@@ -36,6 +36,7 @@ const dateLabel = (date: string) => {
 
 function Home() {
   const [tasks, setTasks] = useState<Task[]>(loadTasks);
+  const [taskView, setTaskView] = useState<'today' | 'all'>('today');
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('');
@@ -63,11 +64,6 @@ function Home() {
     return () => window.clearInterval(timer);
   }, [running]);
 
-  const completedCount = tasks.filter((task) => task.completed).length;
-  const progress = tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0;
-  const remaining = tasks.length - completedCount;
-  const time = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
-
   const addTask = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const cleanTitle = title.trim();
@@ -92,6 +88,14 @@ function Home() {
     setTasks((current) => current.map((task) => task.id === id ? { ...task, completed: !task.completed } : task));
   };
 
+  const today = todayKey();
+  const todayTasks = tasks.filter((task) => task.dueDate === today);
+  const visibleTasks = taskView === 'today' ? todayTasks : tasks;
+  const completedCount = visibleTasks.filter((task) => task.completed).length;
+  const progress = visibleTasks.length ? Math.round((completedCount / visibleTasks.length) * 100) : 0;
+  const remaining = visibleTasks.length - completedCount;
+  const time = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
+
   return (
     <div className="app-shell">
       <aside className="sidebar" aria-label="Main navigation">
@@ -100,8 +104,13 @@ function Home() {
           <div className="brand-name">focus<span>flow</span></div>
         </div>
         <div className="sidebar-label">Workspace</div>
-        <nav>
-          <div className="nav-item active" aria-current="page"><ListTodo size={17} /><span>Today</span></div>
+        <nav aria-label="Task views">
+          <button className={`nav-item${taskView === 'today' ? ' active' : ''}`} type="button" onClick={() => setTaskView('today')} aria-current={taskView === 'today' ? 'page' : undefined}>
+            <ListTodo size={17} /><span>Today</span><span className="nav-count">{todayTasks.length}</span>
+          </button>
+          <button className={`nav-item${taskView === 'all' ? ' active' : ''}`} type="button" onClick={() => setTaskView('all')} aria-current={taskView === 'all' ? 'page' : undefined}>
+            <CalendarDays size={17} /><span>All tasks</span><span className="nav-count">{tasks.length}</span>
+          </button>
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-note">
@@ -119,14 +128,14 @@ function Home() {
       <main className="main">
         <div className="content">
           <div className="topbar">
-            <div className="crumb"><span>Workspace</span><ChevronRight size={13} /><strong>Today</strong></div>
+            <div className="crumb"><span>Workspace</span><ChevronRight size={13} /><strong>{taskView === 'today' ? 'Today' : 'All tasks'}</strong></div>
             <div className="today-pill"><CalendarDays size={14} /><span>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</span></div>
           </div>
           <section className="greeting" aria-labelledby="page-title">
             <div>
-              <div className="eyebrow">Your day, at a glance</div>
-              <h1 id="page-title">Make today count.</h1>
-              <p>A clear plan makes room for your best work.</p>
+              <div className="eyebrow">{taskView === 'today' ? 'Your day, at a glance' : 'Everything you’re working on'}</div>
+              <h1 id="page-title">{taskView === 'today' ? 'Make today count.' : 'Your full task list.'}</h1>
+              <p>{taskView === 'today' ? 'A clear plan makes room for your best work.' : 'Today’s priorities and what’s coming next.'}</p>
             </div>
             <button className="add-button" type="button" onClick={() => setShowForm((open) => !open)} aria-expanded={showForm} data-testid="button-add-task">
               <Plus size={16} /> Add a task
@@ -136,10 +145,14 @@ function Home() {
           <section className="overview" aria-label="Daily progress and focus timer">
             <div className="progress-card" data-testid="progress-card">
               <div>
-                <div className="progress-title">Daily progress</div>
-                <div className="progress-number" data-testid="text-progress-count">{completedCount} <span style={{ color: '#849187', fontSize: 19, fontWeight: 500 }}>/ {tasks.length}</span></div>
+                <div className="progress-title">{taskView === 'today' ? 'Daily progress' : 'Overall progress'}</div>
+                <div className="progress-number" data-testid="text-progress-count">{completedCount} <span style={{ color: '#849187', fontSize: 19, fontWeight: 500 }}>/ {visibleTasks.length}</span></div>
                 <div className="progress-caption" data-testid="text-progress-summary">
-                  {remaining === 0 ? <><strong>Everything wrapped up.</strong> Take a well-earned pause.</> : <><strong>{remaining} {remaining === 1 ? 'task' : 'tasks'} to go.</strong> Keep your momentum.</>}
+                  {visibleTasks.length === 0
+                    ? <><strong>{taskView === 'today' ? 'No tasks due today.' : 'No tasks yet.'}</strong> Add something when you’re ready.</>
+                    : remaining === 0
+                      ? <><strong>Everything wrapped up.</strong> Take a well-earned pause.</>
+                      : <><strong>{remaining} {remaining === 1 ? 'task' : 'tasks'} to go.</strong> Keep your momentum.</>}
                 </div>
               </div>
               <div className="progress-ring" role="img" aria-label={`${progress}% of tasks complete`}>
@@ -169,10 +182,10 @@ function Home() {
           <section className="task-section" aria-labelledby="tasks-heading">
             <div className="section-head">
               <div>
-                <h2 className="section-title" id="tasks-heading">Today’s tasks</h2>
-                <div className="section-subtitle" data-testid="text-task-count">{tasks.length ? `${remaining} still on your list` : 'Your list is ready for a fresh start'}</div>
+                <h2 className="section-title" id="tasks-heading">{taskView === 'today' ? 'Today’s tasks' : 'All tasks'}</h2>
+                <div className="section-subtitle" data-testid="text-task-count">{visibleTasks.length ? `${remaining} still on your list` : 'Your list is ready for a fresh start'}</div>
               </div>
-              <div className="task-count" data-testid="status-task-count">{tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}</div>
+              <div className="task-count" data-testid="status-task-count">{visibleTasks.length} {visibleTasks.length === 1 ? 'task' : 'tasks'}</div>
             </div>
 
             {showForm && (
@@ -205,9 +218,9 @@ function Home() {
               </form>
             )}
 
-            {tasks.length > 0 ? (
-              <div className="task-list" role="list" aria-label="Tasks for today">
-                {tasks.map((task) => (
+            {visibleTasks.length > 0 ? (
+              <div className="task-list" role="list" aria-label={taskView === 'today' ? 'Tasks due today' : 'All saved tasks'}>
+                {visibleTasks.map((task) => (
                   <div className={`task-row${task.completed ? ' completed' : ''}`} role="listitem" key={task.id} data-testid={`row-task-${task.id}`}>
                     <button
                       type="button"
@@ -235,8 +248,8 @@ function Home() {
             ) : (
               <div className="empty-state" data-testid="empty-tasks">
                 <div className="empty-mark"><CircleCheck size={19} /></div>
-                <strong>A little breathing room.</strong>
-                <p>Add a task when you’re ready to plan what’s next.</p>
+                <strong>{taskView === 'today' && tasks.length > 0 ? 'Nothing due today.' : 'A little breathing room.'}</strong>
+                <p>{taskView === 'today' && tasks.length > 0 ? 'Your other tasks are saved under All tasks.' : 'Add a task when you’re ready to plan what’s next.'}</p>
               </div>
             )}
           </section>
