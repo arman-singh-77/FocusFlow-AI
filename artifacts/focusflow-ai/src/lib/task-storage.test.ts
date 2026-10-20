@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isTask, loadTasks, type Task } from './task-storage.ts';
+import { isTask, loadTasks, saveTasks, STORAGE_KEY, type Task } from './task-storage.ts';
 
 const firstTask: Task = {
   id: 'task-one',
@@ -63,4 +63,44 @@ test('falls back to seeded tasks for invalid JSON and non-array saved values', (
 
 test('keeps an intentionally empty saved task list empty', () => {
   assert.deepEqual(loadTasks(storageWith('[]')), []);
+});
+
+test('falls back to seeded tasks when reading storage throws', () => {
+  const expectedTasks = loadTasks(storageWith(null));
+  const blockedStorage: Pick<Storage, 'getItem'> = {
+    getItem: () => {
+      throw new Error('Storage access denied');
+    },
+  };
+
+  const recovered = loadTasks(blockedStorage);
+  assert.deepEqual(recovered, expectedTasks);
+  assert.ok(recovered.length > 0);
+  assert.ok(recovered.every(isTask));
+});
+
+test('saving tasks does not throw when storage writes are blocked', () => {
+  const blockedStorage: Pick<Storage, 'setItem'> = {
+    setItem: () => {
+      throw new Error('Storage quota exceeded');
+    },
+  };
+
+  assert.doesNotThrow(() => saveTasks([firstTask], blockedStorage));
+});
+
+test('saves task data under the task storage key', () => {
+  let savedKey: string | undefined;
+  let savedValue: string | undefined;
+  const writableStorage: Pick<Storage, 'setItem'> = {
+    setItem: (key, value) => {
+      savedKey = key;
+      savedValue = value;
+    },
+  };
+
+  saveTasks([firstTask], writableStorage);
+
+  assert.equal(savedKey, STORAGE_KEY);
+  assert.deepEqual(JSON.parse(savedValue ?? ''), [firstTask]);
 });

@@ -69,3 +69,14 @@ export function loadTasks(storage?: Pick<Storage, 'getItem'>): Task[] {
   }
   return seededTasks();
 }
+
+export function saveTasks(
+  tasks: Task[],
+  storage?: Pick<Storage, 'setItem'>,
+): void {
+  try {
+    (storage ?? localStorage).setItem(STORAGE_KEY, JSON.stringify(tasks));
+  } catch {
+    // Storage can be unavailable or full; keep the in-memory task changes usable.
+  }
+}

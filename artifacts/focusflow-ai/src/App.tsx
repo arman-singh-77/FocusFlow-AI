@@ -24,7 +24,7 @@ import {
   useLocation,
   Router as WouterRouter,
 } from 'wouter';
-import { loadTasks, STORAGE_KEY, todayKey, type Task } from '@/lib/task-storage';
+import { loadTasks, saveTasks, todayKey, type Task } from '@/lib/task-storage';
 
 const queryClient = new QueryClient();
 
@@ -46,7 +46,7 @@ function Home() {
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    saveTasks(tasks);
   }, [tasks]);
 
   useEffect(() => {
