@@ -53,12 +53,44 @@ function seededTasks(): Task[] {
   ];
 }
 
+function isTask(value: unknown): value is Task {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const task = value as Record<string, unknown>;
+  const dueDate = typeof task.dueDate === 'string'
+    ? new Date(`${task.dueDate}T00:00:00.000Z`)
+    : null;
+  const hasValidDueDate =
+    typeof task.dueDate === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(task.dueDate) &&
+    dueDate !== null &&
+    !Number.isNaN(dueDate.getTime()) &&
+    dueDate.toISOString().slice(0, 10) === task.dueDate;
+
+  return (
+    typeof task.id === 'string' &&
+    task.id.length > 0 &&
+    typeof task.title === 'string' &&
+    task.title.trim().length > 0 &&
+    typeof task.subject === 'string' &&
+    task.subject.trim().length > 0 &&
+    (task.priority === 'High' || task.priority === 'Medium' || task.priority === 'Low') &&
+    hasValidDueDate &&
+    typeof task.completed === 'boolean'
+  );
+}
+
 function loadTasks(): Task[] {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved !== null) {
       const parsed: unknown = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed as Task[] : [];
+      if (!Array.isArray(parsed)) return seededTasks();
+
+      const validTasks = parsed.filter(isTask);
+      return parsed.length > 0 && validTasks.length === 0
+        ? seededTasks()
+        : validTasks;
     }
   } catch {
     return seededTasks();
