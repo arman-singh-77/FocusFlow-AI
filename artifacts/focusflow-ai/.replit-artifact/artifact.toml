@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "FocusFlow AI"
+description = "A student productivity dashboard for organizing today's study tasks, tracking progress, and starting focused work sessions. This first version uses sample tasks and browser storage without a database or AI integration."
+version = "1.0.0"
+id = "artifacts/focusflow-ai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23064
+
+[services.development]
+run = "pnpm --filter @workspace/focusflow-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/focusflow-ai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/focusflow-ai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23064"
+BASE_PATH = "/"
