@@ -1,0 +1,9 @@
+[project]
+name = "focusflow-ai-api"
+version = "0.1.0"
+description = "Python API service for FocusFlow AI"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.156.6",
+    "uvicorn>=0.54.0",
+]
