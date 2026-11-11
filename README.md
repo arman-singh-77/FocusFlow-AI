@@ -63,23 +63,30 @@
 
 ### Prerequisites
 - Node.js (v18 or higher recommended)
-- npm or pnpm
+- Python 3.13+ (optional, for the FastAPI health service)
+- npm
 
 ### Running Locally
 ```bash
-# 1. Install dependencies (already installed)
+# 1. Install frontend dependencies (if not already installed)
 npm install
 
-# 2. Start Vite development server
+# 2. Start Vite development server (proxies /focusflow-api -> port 8000)
 npm run dev
 
-# 3. Open browser at http://localhost:5173
+# 3. (Optional) Start the FastAPI backend health endpoint in a second terminal
+npm run dev:api
+
+# 4. Open browser at http://localhost:5173
 ```
 
 ### Running Tests & Building
 ```bash
-# Run automated verification tests
+# Run automated verification tests (NL command engine + storage recovery & legacy migration)
 npm test
+
+# Run TypeScript type checks
+npm run typecheck
 
 # Run TypeScript compiler checks and build for production
 npm run build
@@ -99,7 +106,7 @@ FocusFlow-AI/
 │   │   ├── task.ts            # Task model, filters, categories, and statistics types
 │   │   └── chat.ts            # Chat message models, command intents, and pending actions
 │   ├── services/
-│   │   ├── storage.ts         # LocalStorage persistence, theme, and JSON backup/import
+│   │   ├── storage.ts         # LocalStorage persistence, legacy Replit migration, theme & JSON backup
 │   │   ├── sound.ts           # Synthesized Web Audio API bells and chimes (zero dependencies)
 │   │   ├── taskEngine.ts      # Safe structured task command parser & fuzzy matcher
 │   │   └── gemini.ts          # Clean integration point for Google Gemini API
@@ -121,7 +128,8 @@ FocusFlow-AI/
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── index.css
-├── test-runner.ts             # Automated test suite for task commands & safety rules
+├── archive/replit/            # Preserved Replit monorepo, Express server & FastAPI health backend
+├── test-runner.ts             # Automated test suite for task commands, safety rules & storage recovery
 ├── tailwind.config.js
 └── vite.config.ts
 ```
