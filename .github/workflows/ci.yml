@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Type check
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+
+  api-health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install API dependencies
+        run: pip install fastapi uvicorn httpx
+      - name: Smoke-test health endpoint
+        run: |
+          python - <<'EOF'
+          from fastapi.testclient import TestClient
+          import sys, os
+          sys.path.insert(0, os.path.join("archive", "replit", "artifacts", "focusflow-ai", "backend"))
+          from main import app
+          client = TestClient(app)
+          r = client.get("/focusflow-api/healthz")
+          assert r.status_code == 200, f"Expected 200, got {r.status_code}: {r.text}"
+          assert r.json().get("status") == "ok", f"Unexpected body: {r.json()}"
+          print("Health check passed:", r.json())
+          EOF

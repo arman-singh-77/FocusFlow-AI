@@ -1,135 +1,100 @@
-# FocusFlow AI 🌿
+# FocusFlow AI
+![React 18](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white) ![TypeScript 5.6](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white) ![Vite 5](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-local%20health-009688?logo=fastapi&logoColor=white)
 
-> A complete, polished, responsive productivity web application designed with a calm aesthetic, intelligent task command layer, interactive calendar, focus timer, and conversational assistant.
+An AI assisted productivity app that turns natural language into scheduled tasks, then helps you follow through with a calendar, focus timer, and task aware assistant. FocusFlow pairs Gemini with an offline deterministic parser so core task commands continue to work without an API key.
 
----
+## Why FocusFlow
 
-## ✨ Features
+Many productivity tools make quick capture and task organization separate steps. FocusFlow accepts natural language, extracts task details locally, and stores tasks in the browser. Optional Gemini support adds an AI path, while deterministic parsing remains available as a fallback. The project also brings the React/Vite experience together with preserved Replit source and a small FastAPI health service without replacing that original source.
 
-1. **Dashboard & Sidebar Navigation**
-   - **Views**: Dashboard, Today, All Tasks, Calendar, Focus Timer, Settings.
-   - **Responsive**: Full sidebar on desktop and ergonomic touch-friendly bottom navigation bar on mobile.
-   - **Real-Time Metrics**: Daily completion progress ring, active flow streak, high priority action spotlight, overdue alert counters.
+## Features
 
-2. **Full Task Management**
-   - Create, edit, delete (with safety confirmation dialog), and toggle complete.
-   - Rich fields: Title, description, due date, due time, priority (`High`, `Medium`, `Low`), and subject/category (`Coding`, `Study`, `Assignment`, `Work`, `Health`, `Personal`).
-   - Categorized badges with distinct, accessible color coding.
+- React 18, TypeScript, Vite, and Tailwind responsive interface
+- Dashboard, Today, All Tasks, Calendar, Focus Timer, and Settings views
+- Hybrid task commands: optional Gemini (`gemini-2.5-flash`) plus deterministic offline parsing
+- Confirmation before destructive delete actions
+- Task search, filters, sorting, categories, priority, due dates, and focus time tracking
+- 25 minute focus timer, short and long breaks, and synthesized Web Audio chimes
+- Browser localStorage persistence, legacy Replit task migration, and JSON backup/import
+- Optional FastAPI health endpoint proxied by Vite during local development
 
-3. **Today & All Tasks Views**
-   - **Today View**: Dedicated daily agenda with quick-add input bar for instant scheduling.
-   - **All Tasks View**: Search by title, notes, or subject; filter tabs (`All`, `Pending`, `Completed`, `Overdue`); filter by category or priority; sort by due date, priority, title, or creation date.
-   - Clear empty states with helpful illustrations and 1-click actions.
+## Architecture
 
-4. **Interactive Schedule Calendar**
-   - Full monthly matrix view displaying scheduled task dots and preview chips on each calendar date.
-   - Month and year navigation with an instant "Today" jump button.
-   - Clicking any day highlights the date and opens the **Day Task Inspector**, allowing you to inspect, complete, or schedule tasks directly for that date.
+```mermaid
+flowchart LR
+    User[User] --> UI[React and TypeScript UI]
+    UI --> Context[Task, Theme, and Timer contexts]
+    Context --> Store[Browser localStorage]
+    UI --> Parser[Deterministic task parser]
+    UI -. optional .-> Gemini[Gemini REST API]
+    Gemini -. failure or unavailable .-> Parser
+    UI --> Vite[Vite development server]
+    Vite -->|/focusflow-api| API[FastAPI health service]
+    Archive[Preserved Replit source] -. archived .-> API
+```
 
-5. **25-Minute Focus Timer (Pomodoro)**
-   - Modes: 25-minute Pomodoro, 5-minute Short Break, and 15-minute Long Break.
-   - Start, pause, reset, and live circular progress animation.
-   - **Link to Task**: Connect the active timer session to a specific task to automatically log deep focus minutes.
-   - **Calming Acoustic Chimes**: Synthesized with the Web Audio API—100% offline, zero network dependencies.
+The browser stores the Gemini key locally when the user supplies one. Task parsing, storage, and synthesized audio can run without Gemini. On first load, the storage layer checks the current `focusflow_tasks_v1` key. If it is absent, it can read legacy `focusflow.tasks.v1`, normalize valid task entries, and save migrated entries under the current key. Existing legacy data is retained.
 
-6. **Calm Aesthetic & Theme Toggle**
-   - **Light Theme**: Warm cream backgrounds (`#FAF8F5`), muted mint surfaces (`#E8F3EE`), forest-green accents (`#28533E`), rounded-2xl cards, and subtle borders.
-   - **Dark Theme**: Deep charcoal backgrounds (`#111614`, `#161F1A`) with soft glowing mint accents (`#4ADE80`, `#5EEAD4`) and accessible contrast.
-   - Persistent theme storage (`light`, `dark`, or `system`).
+## Requirements
 
-7. **Floating FlowAI Assistant & Safe Structured Command Layer**
-   - Bottom-right floating trigger button that opens an elegant slide-in conversation panel.
-   - Understands natural language requests:
-     - *"Add DSA practice tomorrow at 6 PM"*
-     - *"Move my Python assignment to Friday"*
-     - *"What should I do today?"*
-     - *"Which tasks are overdue?"*
-     - *"Mark DSA practice as done"*
-     - *"Start focus timer for 25 minutes"*
-   - **Safe Command Execution**: Modifies the exact same task data store as the UI, with immediate reactive updates.
-   - **Destructive Action Safety**: Never deletes tasks without explicit confirmation; renders an interactive `[Confirm Delete]` / `[Cancel]` dialog in chat.
-   - **Clarification Handling**: Prompts for missing details when requests are ambiguous.
-   - **Transparent Integration**: Runs on a built-in deterministic rule engine out-of-the-box (zero API keys required, works completely offline).
-   - **Optional Gemini AI**: In Settings, users can optionally connect their Google Gemini API key (stored safely in local browser storage only) with a built-in connection test and automatic fallback.
+- Node.js 18 or later and npm
+- Python 3.13 or later only if you want to run the optional FastAPI service
 
-8. **Local Data Persistence & Portability**
-   - Zero backend or database setup needed.
-   - Pre-seeded with realistic sample tasks on first launch.
-   - JSON export and import for seamless backup and transfer.
+## Run locally
 
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v18 or higher recommended)
-- Python 3.13+ (optional, for the FastAPI health service)
-- npm
-
-### Running Locally
-```bash
-# 1. Install frontend dependencies (if not already installed)
-npm install
-
-# 2. Start Vite development server (proxies /focusflow-api -> port 8000)
+```powershell
+npm ci
 npm run dev
+```
 
-# 3. (Optional) Start the FastAPI backend health endpoint in a second terminal
+Open <http://localhost:5173>. For the optional API health endpoint, install its Python dependencies once, then start a second terminal:
+
+```powershell
+python -m pip install fastapi uvicorn
 npm run dev:api
-
-# 4. Open browser at http://localhost:5173
 ```
 
-### Running Tests & Building
-```bash
-# Run automated verification tests (NL command engine + storage recovery & legacy migration)
+Then check `http://localhost:5173/focusflow-api/healthz`. Vite forwards `/focusflow-api` requests to `http://127.0.0.1:8000` while the development server runs.
+
+Gemini is optional. Add a key through Settings to enable the Gemini path; without it, the deterministic parser remains available.
+
+## Verify
+
+```powershell
 npm test
-
-# Run TypeScript type checks
 npm run typecheck
-
-# Run TypeScript compiler checks and build for production
 npm run build
-
-# Preview production build
-npm run preview
 ```
 
----
+## Project layout
 
-## 📁 Architecture Overview
+- `src/services/taskEngine.ts`: structured task command parsing and matching
+- `src/utils/dateUtils.ts`: date and time extraction
+- `src/services/storage.ts`: validated browser persistence, legacy migration, and JSON import/export
+- `src/context/`: shared task, theme, and timer state
+- `src/components/`: app views and UI components
+- `archive/replit/`: preserved Replit source, including the FastAPI backend
+- `test-runner.ts`: command safety, storage recovery, and migration checks
+- `vite.config.ts`: local API proxy configuration
 
-```
-FocusFlow-AI/
-├── src/
-│   ├── types/
-│   │   ├── task.ts            # Task model, filters, categories, and statistics types
-│   │   └── chat.ts            # Chat message models, command intents, and pending actions
-│   ├── services/
-│   │   ├── storage.ts         # LocalStorage persistence, legacy Replit migration, theme & JSON backup
-│   │   ├── sound.ts           # Synthesized Web Audio API bells and chimes (zero dependencies)
-│   │   ├── taskEngine.ts      # Safe structured task command parser & fuzzy matcher
-│   │   └── gemini.ts          # Clean integration point for Google Gemini API
-│   ├── context/
-│   │   ├── TaskContext.tsx    # Global task state, CRUD, statistics, and filtering
-│   │   ├── ThemeContext.tsx   # Light/dark/system theme management
-│   │   └── TimerContext.tsx   # Pomodoro ticker and session state
-│   ├── components/
-│   │   ├── layout/            # Sidebar, TopHeader, and MobileNav
-│   │   ├── dashboard/         # DashboardView, StatCard, and ProgressRing
-│   │   ├── tasks/             # TodayView, AllTasksView, TaskCard, TaskModal, DeleteDialog
-│   │   ├── calendar/          # CalendarView and Day Task Inspector
-│   │   ├── timer/             # FocusTimerView and QuickTimerWidget
-│   │   ├── chat/              # FlowChatbot, ChatMessage, and SuggestedPrompts
-│   │   └── settings/          # SettingsView (Themes, Gemini config, backup/import)
-│   ├── utils/
-│   │   ├── dateUtils.ts       # Natural language date/time parsing and formatting
-│   │   └── sampleData.ts      # Curated starter tasks
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-├── archive/replit/            # Preserved Replit monorepo, Express server & FastAPI health backend
-├── test-runner.ts             # Automated test suite for task commands, safety rules & storage recovery
-├── tailwind.config.js
-└── vite.config.ts
-```
+## GitHub About
+
+**Description:** AI powered productivity app with hybrid Gemini and offline task parsing, calendar, Pomodoro timer, and FastAPI health service.
+
+**Suggested topics:** `productivity`, `react`, `typescript`, `vite`, `fastapi`, `python`, `generative-ai`, `natural-language-processing`, `pomodoro`, `task-management`
+
+## Portfolio bullets
+
+- Built a responsive React and TypeScript productivity app with task search, filtering, an interactive calendar, and a task linked Pomodoro timer.
+- Implemented a hybrid natural language task engine using Gemini with deterministic offline parsing, ambiguity handling, and explicit confirmation for destructive actions.
+- Added validated localStorage persistence with a backward compatible legacy task migration, JSON backup/import, and a FastAPI health endpoint proxied through Vite.
+
+## License
+
+No license is included in this source package. Add a license file before redistributing the project publicly if you intend to grant reuse rights.
+
+
+
+
+
+
