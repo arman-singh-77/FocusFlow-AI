@@ -91,7 +91,7 @@ npm run build
 
 ## License
 
-No license is included in this source package. Add a license file before redistributing the project publicly if you intend to grant reuse rights.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 
 
