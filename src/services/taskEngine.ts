@@ -284,13 +284,17 @@ export function parseTaskCommand(input: string, currentTasks: Task[]): CommandPa
     const parsedDateTime = parseNaturalDateAndTimeString(rawContent);
     const priority = inferPriority(rawContent);
 
-    // Clean title by removing date/time and priority keywords
-    let cleanTitle = rawContent;
-    if (parsedDateTime.matchedText) {
-      const escaped = parsedDateTime.matchedText.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-      cleanTitle = cleanTitle.replace(new RegExp(`(?:at|on|by|for)?\\s*${escaped}`, 'gi'), '');
-    }
-
+    // Remove date and time phrases separately because matched text can be reordered.
+    let cleanTitle = rawContent
+      .replace(/\b(?:day after tomorrow|today|tomorrow|yesterday)\b/gi, '')
+      .replace(/\b(?:next\s+)?(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/gi, '')
+      .replace(/\b\d{4}-\d{1,2}-\d{1,2}\b/g, '')
+      .replace(/\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+\d{1,2}(?:st|nd|rd|th)?\b/gi, '')
+      .replace(/\b\d{1,2}(?:st|nd|rd|th)?\s+(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/gi, '')
+      .replace(/\b(?:at\s*)?\d{1,2}(?::\d{2})?\s*(?:am|pm)\b/gi, '')
+      .replace(/\bat\s+\d{1,2}:\d{2}\b/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
     // Remove priority phrases from title
     cleanTitle = cleanTitle
       .replace(/\b(?:with\s+)?(?:high|medium|low)\s+priority\b/gi, '')
@@ -349,11 +353,11 @@ export function parseTaskCommand(input: string, currentTasks: Task[]): CommandPa
     confidence: 0.2,
     params: {},
     clarificationNeeded: `I didn't quite catch that. You can say things like:
-• "Add DSA practice tomorrow at 6 PM"
-• "Move my Python assignment to Friday"
+• "Add grocery shopping tomorrow at 5 PM"
+• "Move my lab report to Friday"
 • "What should I do today?"
 • "Which tasks are overdue?"
-• "Mark DSA practice as done"
+• "Mark my notes as done"
 • "Delete [task title]"`,
   };
 }
@@ -368,7 +372,7 @@ export function formatTodayTasksResponse(tasks: Task[]): { text: string; tasks: 
 
   if (todayTasks.length === 0) {
     return {
-      text: "You have no tasks scheduled for today! Would you like to add one? (e.g. 'Add DSA practice today at 5 PM')",
+      text: "You have no tasks scheduled for today! Would you like to add one? (e.g. 'Add grocery shopping today at 5 PM')",
       tasks: [],
     };
   }

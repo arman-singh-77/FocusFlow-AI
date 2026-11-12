@@ -6,8 +6,8 @@ interface SuggestedPromptsProps {
 }
 
 const PROMPTS = [
-  'Add DSA practice tomorrow at 6 PM',
-  'Move my Python assignment to Friday',
+  'Add grocery shopping tomorrow at 5 PM',
+  'Move my lab report to Friday',
   'What should I do today?',
   'Which tasks are overdue?',
   'Show high priority tasks',

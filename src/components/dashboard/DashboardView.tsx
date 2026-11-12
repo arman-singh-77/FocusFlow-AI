@@ -57,7 +57,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-forest-950 dark:text-cream-50">
-              {getGreeting()}, flow state awaits.
+              {getGreeting()}. What would you like to get done?
             </h1>
             <Sparkles className="w-5 h-5 text-amber-500 hidden sm:inline" />
           </div>

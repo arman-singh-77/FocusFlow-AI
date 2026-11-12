@@ -52,6 +52,11 @@ assert(addCmd.intent === 'ADD_TASK', 'Command intent is ADD_TASK');
 assert(Boolean(addCmd.params.title?.toLowerCase().includes('dsa practice')), 'Title extracted: "DSA practice"');
 assert(addCmd.params.dueTime === '18:00', 'Due time is 18:00');
 assert(addCmd.params.category === 'Coding', 'Category inferred as Coding');
+assert(addCmd.params.title?.toLowerCase() === 'dsa practice', 'Task title excludes parsed date and time');
+
+const groceriesCmd = parseTaskCommand('add pick up groceries tomorrow at 6 PM', tasks);
+assert(groceriesCmd.params.title === 'Pick up groceries', 'Keeps the natural task title without date/time text');
+assert(groceriesCmd.params.dueTime === '18:00', 'Parses grocery task time');
 
 // Test 3: MOVE_TASK "move my Python assignment to Friday"
 const moveCmd = parseTaskCommand('move my Python assignment to Friday', tasks);
@@ -68,7 +73,7 @@ const overdueCmd = parseTaskCommand('which tasks are overdue?', tasks);
 assert(overdueCmd.intent === 'QUERY_OVERDUE', 'Command intent is QUERY_OVERDUE');
 
 // Test 6: Safe Delete with Mandatory Confirmation
-const deleteCmd = parseTaskCommand('delete DSA practice', tasks);
+const deleteCmd = parseTaskCommand('delete Review my algorithms notes', tasks);
 assert(deleteCmd.intent === 'DELETE_TASK', 'Command intent is DELETE_TASK');
 assert(deleteCmd.requiresConfirmation === true, 'Destructive delete requires confirmation');
 assert(deleteCmd.confirmationMessage !== undefined, 'Has safety confirmation prompt');

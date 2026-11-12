@@ -26,14 +26,14 @@ interface FlowChatbotProps {
 const INITIAL_MESSAGE: ChatMessageType = {
   id: 'msg-welcome',
   role: 'assistant',
-  text: `Hello! I'm **FlowAI**, your personal productivity copilot. 🌿
+  text: `Hi, I'm **FlowAI**. I can help keep your day organized.
 
 I can manage your tasks directly through natural conversation:
-• "Add DSA practice tomorrow at 6 PM"
-• "Move my Python assignment to Friday"
+• "Add grocery shopping tomorrow at 5 PM"
+• "Move my lab report to Friday"
 • "What should I do today?"
 • "Which tasks are overdue?"
-• "Mark DSA practice as done"
+• "Mark my notes as done"
 • "Start focus timer for 25 minutes"
 
 How can I help you flow today?`,
@@ -41,7 +41,7 @@ How can I help you flow today?`,
   suggestedQuickReplies: [
     'What should I do today?',
     'Which tasks are overdue?',
-    'Add DSA practice tomorrow at 6 PM',
+    'Add grocery shopping tomorrow at 5 PM',
   ],
 };
 
@@ -79,11 +79,11 @@ export const FlowChatbot: React.FC<FlowChatbotProps> = ({ onNavigateToTimer }) =
     if (cmd.intent === 'HELP') {
       return {
         text: `Here is what I can do for you:
-• **Add task**: "Add DSA practice tomorrow at 6 PM priority high"
-• **Reschedule**: "Move my Python assignment to Friday"
+• **Add task**: "Add grocery shopping tomorrow at 5 PM"
+• **Reschedule**: "Move my lab report to Friday"
 • **Query Today**: "What should I do today?"
 • **Query Overdue**: "Which tasks are overdue?"
-• **Complete**: "Mark DSA practice as done"
+• **Complete**: "Mark my notes as done"
 • **Delete**: "Delete [task title]" (requires confirmation)
 • **Focus**: "Start focus timer 25 minutes"`,
         suggestedQuickReplies: ['What should I do today?', 'Which tasks are overdue?'],
@@ -96,7 +96,7 @@ export const FlowChatbot: React.FC<FlowChatbotProps> = ({ onNavigateToTimer }) =
       return {
         text,
         actionTaken: { type: 'queried' as const, tasks: todayList },
-        suggestedQuickReplies: todayList.length > 0 ? [`Complete ${todayList[0].title}`] : ['Add DSA practice today'],
+        suggestedQuickReplies: todayList.length > 0 ? [`Complete ${todayList[0].title}`] : ['Add grocery shopping today'],
       };
     }
 
@@ -447,7 +447,7 @@ export const FlowChatbot: React.FC<FlowChatbotProps> = ({ onNavigateToTimer }) =
               type="text"
               value={inputText}
               onChange={e => setInputText(e.target.value)}
-              placeholder="e.g. 'Add DSA practice tomorrow at 6 PM'..."
+              placeholder="e.g. 'Add grocery shopping tomorrow at 5 PM'..."
               className="flex-1 px-3.5 py-2 text-xs sm:text-sm bg-cream-100/70 dark:bg-charcoal-800 border border-cream-300 dark:border-charcoal-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest-600/30 text-stone-900 dark:text-cream-50 placeholder:text-stone-400 transition"
             />
             <button

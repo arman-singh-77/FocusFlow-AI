@@ -5,118 +5,26 @@ export function getSampleTasks(): Task[] {
   const today = getTodayString();
   const tomorrow = getTomorrowString();
 
-  // Create yesterday and 2-days-ago dates for overdue/history demo
-  const d1 = new Date();
-  d1.setDate(d1.getDate() - 1);
-  const yesterday = `${d1.getFullYear()}-${pad(d1.getMonth() + 1)}-${pad(d1.getDate())}`;
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = `${yesterdayDate.getFullYear()}-${pad(yesterdayDate.getMonth() + 1)}-${pad(yesterdayDate.getDate())}`;
 
-  const d2 = new Date();
-  d2.setDate(d2.getDate() - 2);
-  const twoDaysAgo = `${d2.getFullYear()}-${pad(d2.getMonth() + 1)}-${pad(d2.getDate())}`;
+  const twoDaysAgoDate = new Date();
+  twoDaysAgoDate.setDate(twoDaysAgoDate.getDate() - 2);
+  const twoDaysAgo = `${twoDaysAgoDate.getFullYear()}-${pad(twoDaysAgoDate.getMonth() + 1)}-${pad(twoDaysAgoDate.getDate())}`;
 
-  // Next week date
-  const d3 = new Date();
-  d3.setDate(d3.getDate() + 4);
-  const nextWeek = `${d3.getFullYear()}-${pad(d3.getMonth() + 1)}-${pad(d3.getDate())}`;
+  const nextWeekDate = new Date();
+  nextWeekDate.setDate(nextWeekDate.getDate() + 4);
+  const nextWeek = `${nextWeekDate.getFullYear()}-${pad(nextWeekDate.getMonth() + 1)}-${pad(nextWeekDate.getDate())}`;
 
   return [
-    {
-      id: 'task-1',
-      title: 'DSA Practice — Binary Search Trees & DP',
-      description: 'Solve 3 LeetCode medium questions and review optimal edge cases.',
-      dueDate: today,
-      dueTime: '18:00',
-      priority: 'high',
-      category: 'Coding',
-      completed: false,
-      createdAt: new Date().toISOString(),
-      focusMinutes: 25,
-    },
-    {
-      id: 'task-2',
-      title: 'Python assignment: Data Visualization',
-      description: 'Complete Seaborn plots and finalize Jupyter notebook conclusions.',
-      dueDate: tomorrow,
-      dueTime: '16:00',
-      priority: 'high',
-      category: 'Assignment',
-      completed: false,
-      createdAt: new Date().toISOString(),
-      focusMinutes: 50,
-    },
-    {
-      id: 'task-3',
-      title: 'Review Operating Systems Memory Management',
-      description: 'Paging, TLB lookups, and virtual memory slides for mid-term.',
-      dueDate: today,
-      dueTime: '20:30',
-      priority: 'medium',
-      category: 'Study',
-      completed: false,
-      createdAt: new Date().toISOString(),
-      focusMinutes: 0,
-    },
-    {
-      id: 'task-4',
-      title: 'Submit Lab Report for Computer Networks',
-      description: 'Wireshark packet capture analysis and subnet masking tables.',
-      dueDate: yesterday,
-      dueTime: '17:00',
-      priority: 'high',
-      category: 'Assignment',
-      completed: false,
-      createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-      focusMinutes: 30,
-    },
-    {
-      id: 'task-5',
-      title: 'Read System Design Chapter 3: Rate Limiting',
-      description: 'Token bucket vs leaky bucket algorithm implementations.',
-      dueDate: today,
-      dueTime: '11:00',
-      priority: 'low',
-      category: 'Study',
-      completed: true,
-      completedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      focusMinutes: 45,
-    },
-    {
-      id: 'task-6',
-      title: '30-minute Evening Run & Mobility Stretch',
-      description: 'Zone 2 cardio and hamstring recovery stretches.',
-      dueDate: today,
-      dueTime: '19:00',
-      priority: 'medium',
-      category: 'Health',
-      completed: false,
-      createdAt: new Date().toISOString(),
-      focusMinutes: 0,
-    },
-    {
-      id: 'task-7',
-      title: 'Prepare Capstone Project Milestone Slides',
-      description: 'Diagram system architecture, database schema, and test coverage.',
-      dueDate: nextWeek,
-      dueTime: '14:00',
-      priority: 'medium',
-      category: 'Work',
-      completed: false,
-      createdAt: new Date().toISOString(),
-      focusMinutes: 0,
-    },
-    {
-      id: 'task-8',
-      title: 'Set up Vite + TypeScript project boilerplate',
-      description: 'Initial repo setup, Tailwind config, and baseline component structure.',
-      dueDate: twoDaysAgo,
-      dueTime: '12:00',
-      priority: 'low',
-      category: 'Coding',
-      completed: true,
-      completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-      createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-      focusMinutes: 60,
-    },
+    { id: 'task-1', title: 'Review my algorithms notes', description: 'Go over the tree and dynamic programming problems from class.', dueDate: today, dueTime: '18:00', priority: 'high', category: 'Coding', completed: false, createdAt: new Date().toISOString(), focusMinutes: 25 },
+    { id: 'task-2', title: 'Finish the data visualization assignment', description: 'Add the last two charts and write a short summary.', dueDate: tomorrow, dueTime: '16:00', priority: 'high', category: 'Assignment', completed: false, createdAt: new Date().toISOString(), focusMinutes: 50 },
+    { id: 'task-3', title: 'Read the OS notes before class', description: 'Review the memory management lecture and mark anything to ask about.', dueDate: today, dueTime: '20:30', priority: 'medium', category: 'Study', completed: false, createdAt: new Date().toISOString(), focusMinutes: 0 },
+    { id: 'task-4', title: 'Send in the networks lab report', description: 'Check the screenshots and attach the final report.', dueDate: yesterday, dueTime: '17:00', priority: 'high', category: 'Assignment', completed: false, createdAt: new Date(Date.now() - 86400000 * 2).toISOString(), focusMinutes: 30 },
+    { id: 'task-5', title: 'Read a chapter on system design', description: 'Take a few notes while reading.', dueDate: today, dueTime: '11:00', priority: 'low', category: 'Study', completed: true, completedAt: new Date().toISOString(), createdAt: new Date().toISOString(), focusMinutes: 45 },
+    { id: 'task-6', title: 'Go for a run', description: 'Easy 30 minutes, weather permitting.', dueDate: today, dueTime: '19:00', priority: 'medium', category: 'Health', completed: false, createdAt: new Date().toISOString(), focusMinutes: 0 },
+    { id: 'task-7', title: 'Put together slides for the project check-in', description: 'Add the latest progress and a couple of questions for the team.', dueDate: nextWeek, dueTime: '14:00', priority: 'medium', category: 'Work', completed: false, createdAt: new Date().toISOString(), focusMinutes: 0 },
+    { id: 'task-8', title: 'Set up the starter app', description: 'Create the repo and get the basic page running.', dueDate: twoDaysAgo, dueTime: '12:00', priority: 'low', category: 'Coding', completed: true, completedAt: new Date(Date.now() - 86400000 * 2).toISOString(), createdAt: new Date(Date.now() - 86400000 * 3).toISOString(), focusMinutes: 60 },
   ];
 }
